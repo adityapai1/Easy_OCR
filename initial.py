@@ -12,11 +12,10 @@ def check_words_in_reader_list(text_words):
 def upload_file():
     if request.method == "POST":
         uploaded_file = request.files["file"]
-        if uploaded_file:
-            text = uploaded_file.read().decode("utf-8")
-            text_words = text.split(",")
-            matching_words = check_words_in_reader_list(text_words)
-            return render_template("result.html", words=matching_words)
+        text = uploaded_file.read().decode("utf-8")
+        text_words = text.split(",")
+        matching_words = check_words_in_reader_list(text_words) #function call to get the correct words
+        return render_template("result.html", words=matching_words)
     return render_template("form2.html")
 
 if __name__ == "__main__":

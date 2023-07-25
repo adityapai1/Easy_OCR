@@ -4,102 +4,60 @@ import os
 import shutil
 import time
 import datetime
-from PIL import Image
-
 import math
 import re
-
+import csv
 
 app = Flask(__name__)
 
-def ocr_program(target_folder,pattern):
+def check_words_in_reader_list(text_words, reader_list):
+    return [word for word in text_words if word in reader_list]
+
+def ocr_program(target_folder, keyword_file):
     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
 
-    
+    # Read the keyword file and create a list of keywords
+    with open(keyword_file, "r", encoding='utf-8') as f:
+        reader_list = f.read().split(",")
 
-    #pattern  = 'namrata'
-    print("Entered the ocr function")
-    for dirpath, dirnames, filenames in os.walk(target_folder): #for Recursive Searching of Images
-
-        if (dirnames == "manual") or (dirnames == pattern) :
-            continue
+    for dirpath, _, filenames in os.walk(target_folder):
         counter = 1
-        dump =[]
         for image in filenames:
-            
-            word_list =[]
             if (image.endswith('.jpg') or image.endswith('.png') or image.endswith('.jpeg')) and 'tmb' not in image:
                 start_time = time.time()
-                result = reader.readtext(dirpath.replace(".\\", '')+"\\"+image, detail=0, paragraph=False)
-                word_list.extend(result)
-                
-                flag = False
+                result = reader.readtext(os.path.join(dirpath, image), detail=0, paragraph=False)
 
-                for i in result:
+                # Match OCR output with keyword list
+                matching_words = check_words_in_reader_list(result, reader_list)
 
-
-                    if re.search(pattern, i.upper(), flags=re.I|re.M|re.X):
-                        flag = True
-                        break
-
-                    else:
-                        flag = False
-
-                if flag == True:
-                    #os.chdir("/home/varun/temp")
-                    #SpecificDir = dirpath.replace(".\\", '')+"\\"+pattern+"\\"
-                    if not os.path.exists(dirpath.replace(".\\", '')+"\\"+pattern+"\\"):
-                        #os.chdir("..")
-                        os.makedirs(dirpath.replace(".\\", '')+"\\"+pattern+"\\")
-                        print("New folder created successfully!")
-
-                    shutil.copy(dirpath.replace(".\\", '')+"\\"+image, dirpath.replace(".\\", '')+"\\"+pattern+"\\")
-
-
+                if matching_words:
+                    for keyword in matching_words:
+                        if not os.path.exists(os.path.join(dirpath, keyword)):
+                            os.makedirs(os.path.join(dirpath, keyword))
+                        shutil.copy(os.path.join(dirpath, image), os.path.join(dirpath, keyword))
                 else:
-                    if not os.path.exists(dirpath.replace(".\\", '')+"\\Manual\\"):
-                        os.makedirs(dirpath.replace(".\\", '')+"\\Manual\\")
-                        print("New folder created successfully!")
-
-                    shutil.copy(dirpath.replace(".\\", '')+"\\"+image, dirpath.replace(".\\", '')+"\\Manual\\")
+                    if not os.path.exists(os.path.join(dirpath, "Manual")):
+                        os.makedirs(os.path.join(dirpath, "Manual"))
+                    shutil.copy(os.path.join(dirpath, image), os.path.join(dirpath, "Manual"))
 
                 end_time = time.time()
-                difference = end_time-start_time
-
+                difference = end_time - start_time
                 print(f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
-                counter+=1
-            dump.extend(word_list)
-            index1=len(dump)
-            dump.insert(index1, image)
-            #dump_deduplicated = np.unique(dump) -- to be checked if deduplication is required
-            #np.savetxt(dirpath+"dump.csv", dump_deduplicated, delimiter="|", fmt='% s')
-        if len(dump) > 0:
-            with open(target_folder.replace(".\\", '').replace(".", '')+ time.strftime("%d-%m-%Y") + ".txt", "a", encoding='utf-8') as f:
-                #Header1 = "Time Taken for Image Number-" + str(counter) + " Name-" + image + "-is " + str(difference) + " secs"
-                #f.write("%s\n" % Header1)
-                for item in dump:
-                    f.write("%s\n" % item)
-                    
-
-
+                counter += 1
 
 @app.route('/', methods=['GET', 'POST'])
-
 def index():
     return render_template("form.html")
 
 @app.route('/result', methods=['GET', 'POST'])
-
 def result():
     if request.method == 'POST':
         target_folder = request.form['target_folder']
-        global FolderCodeWord
-        FolderCodeWord = request.form['folder_code_word']
-        ocr_program(target_folder , FolderCodeWord)
-        return render_template("success.html", )
-
-
-
+        keyword_file = request.files['keyword_file']
+        keyword_file.save(os.path.join("temp", keyword_file.filename))
+        ocr_program(target_folder, os.path.join("temp", keyword_file.filename))
+        os.remove(os.path.join("temp", keyword_file.filename))
+        return "Image OCR processing completed. Check the output folders."
 
 if __name__ == '__main__':
     app.run(debug=True)
