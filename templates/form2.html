@@ -1,13 +1,35 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Upload Text File</title>
 </head>
+<style>
+    div {
+        margin: 10% 20%;
+        border: 2px black solid;
+        padding: 20px;
+
+    }
+    form{
+        padding-left: 35%;
+    }
+</style>
+
 <body>
-    <h2>Upload a Text File</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".txt,.csv" required>
-        <button type="submit">Upload</button>
-    </form>
+    
+    <div>
+        
+        <h2 style="text-align: center;">Upload a Text File</h2>
+        <form method="POST" enctype="multipart/form-data">
+
+            <br> <br>
+            <input type="file" name="file" accept=".txt,.csv" required>
+            <br> <br>
+
+            <button type="submit">Upload</button>
+        </form>
+    </div>
 </body>
+
 </html>

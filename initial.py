@@ -14,7 +14,7 @@ def upload_file():
         uploaded_file = request.files["file"]
         if uploaded_file:
             text = uploaded_file.read().decode("utf-8")
-            text_words = text.split()
+            text_words = text.split(",")
             matching_words = check_words_in_reader_list(text_words)
             return render_template("result.html", words=matching_words)
     return render_template("form2.html")
