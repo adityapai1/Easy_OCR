@@ -17,7 +17,7 @@ def upload_file():
             text_words = text.split()
             matching_words = check_words_in_reader_list(text_words)
             return render_template("result.html", words=matching_words)
-    return render_template("form.html")
+    return render_template("form2.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
