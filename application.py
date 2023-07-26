@@ -1,3 +1,17 @@
+from flask import Flask, render_template, request
+import easyocr
+import os
+import shutil
+import time
+import datetime
+from PIL import Image
+
+import math
+import re
+
+
+app = Flask(__name__)
+
 def ocr_program(target_folder, patterns):
     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
 
@@ -51,3 +65,29 @@ def ocr_program(target_folder, patterns):
             with open(target_folder.replace(".\\", '').replace(".", '') + time.strftime("%d-%m-%Y") + ".txt", "a", encoding='utf-8') as f:
                 for item in dump:
                     f.write("%s\n" % item)
+
+
+
+@app.route('/', methods=['GET', 'POST'])
+
+def index():
+    return render_template("form.html")
+
+@app.route('/result', methods=['GET', 'POST'])
+
+def result():
+    if request.method == 'POST':
+        target_folder = request.form['target_folder']
+        global FolderCodeWord
+        FolderCodeWord = request.form['folder_code_word']
+        ocr_program(target_folder , FolderCodeWord)
+        return render_template("success.html", )
+
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
