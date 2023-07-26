@@ -3,11 +3,12 @@ def ocr_program(target_folder, patterns):
 
     print("Entered the OCR function")
     for dirpath, dirnames, filenames in os.walk(target_folder):
-        if (dirnames == "manual") or any(name in dirnames for name in patterns):
-            continue
+        if "Manual" in dirnames:
+            dirnames.remove("Manual")
 
         counter = 1
         dump = []
+        pattern_folders = {}  # To store the dynamically created pattern folders
 
         for image in filenames:
             word_list = []
@@ -27,10 +28,12 @@ def ocr_program(target_folder, patterns):
                         break
 
                 if matched_pattern:
-                    pattern_folder = os.path.join(dirpath, matched_pattern)
-                    if not os.path.exists(pattern_folder):
+                    if matched_pattern not in pattern_folders:
+                        pattern_folder = os.path.join(dirpath, matched_pattern)
                         os.makedirs(pattern_folder)
-                    shutil.copy(os.path.join(dirpath, image), pattern_folder)
+                        pattern_folders[matched_pattern] = pattern_folder
+
+                    shutil.copy(os.path.join(dirpath, image), pattern_folders[matched_pattern])
                 else:
                     manual_folder = os.path.join(dirpath, "Manual")
                     if not os.path.exists(manual_folder):
