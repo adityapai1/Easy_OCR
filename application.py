@@ -24,6 +24,7 @@ def ocr_program(target_folder, patterns):
 
         counter = 1
         dump = []
+        pattern_folders = {}  # To store the dynamically created pattern folders
 
         for image in filenames:
             word_list = []
