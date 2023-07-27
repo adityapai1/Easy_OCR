@@ -13,7 +13,6 @@ import re
 app = Flask(__name__)
 
 
-
 def ocr_program(target_folder, patterns):
     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
 
@@ -24,24 +23,27 @@ def ocr_program(target_folder, patterns):
 
         counter = 1
         dump = []
-        pattern_folders = {}  # To store the dynamically created pattern folders
 
         for image in filenames:
             word_list = []
             if (image.endswith('.jpg') or image.endswith('.png') or image.endswith('.jpeg')) and 'tmb' not in image:
                 start_time = time.time()
-                result = reader.readtext(os.path.join(dirpath, image), detail=0, paragraph=False)
+                result = reader.readtext(os.path.join(
+                    dirpath, image), detail=0, paragraph=False)
                 word_list.extend(result)
 
-                matched_patterns = [pattern for pattern in patterns if any(re.search(pattern, word.upper(), flags=re.I | re.M | re.X) for word in word_list)]
+                matched_patterns = [pattern for pattern in patterns if any(re.search(
+                    pattern, word.upper(), flags=re.I | re.M | re.X) for word in word_list)]
 
                 if matched_patterns:
                     for pattern in matched_patterns:
                         pattern_folder = os.path.join(dirpath, pattern)
                         if not os.path.exists(pattern_folder):
                             os.makedirs(pattern_folder)
-                            print(f"New folder '{pattern}' created successfully!")
-                        shutil.copy(os.path.join(dirpath, image), pattern_folder)
+                            print(
+                                f"New folder '{pattern}' created successfully!")
+                        shutil.copy(os.path.join(
+                            dirpath, image), pattern_folder)
                 else:
                     manual_folder = os.path.join(dirpath, "Manual")
                     if not os.path.exists(manual_folder):
@@ -52,7 +54,8 @@ def ocr_program(target_folder, patterns):
                 end_time = time.time()
                 difference = end_time - start_time
 
-                print(f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
+                print(
+                    f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
                 counter += 1
 
             dump.extend(word_list)
@@ -66,28 +69,23 @@ def ocr_program(target_folder, patterns):
 
 
 @app.route('/', methods=['GET', 'POST'])
-
 def index():
     return render_template("form.html")
 
-@app.route('/result', methods=['GET', 'POST'])
 
+@app.route('/result', methods=['GET', 'POST'])
 def result():
     if request.method == 'POST':
         target_folder = request.form['target_folder']
         folder_code_word = request.form['folder_code_word']
-        
+
         # Convert the comma-separated string into a list
-        patterns_list = [pattern.strip() for pattern in folder_code_word.split(",")]
-        
+        patterns_list = [pattern.strip()
+                         for pattern in folder_code_word.split(",")]
+
         ocr_program(target_folder, patterns_list)
         return render_template("success.html")
 
 
-
-
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
