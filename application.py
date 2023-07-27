@@ -12,6 +12,65 @@ import re
 
 app = Flask(__name__)
 
+# def ocr_program(target_folder, patterns):
+#     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
+
+#     for pattern in patterns:
+#         print(f"{pattern}\n")
+
+#     print("Entered the OCR function")
+#     for dirpath, dirnames, filenames in os.walk(target_folder):
+#         if "Manual" in dirnames:
+#             dirnames.remove("Manual")
+
+#         counter = 1
+#         dump = []
+
+#         for image in filenames:
+#             word_list = []
+#             if (image.endswith('.jpg') or image.endswith('.png') or image.endswith('.jpeg')) and 'tmb' not in image:
+#                 start_time = time.time()
+#                 result = reader.readtext(os.path.join(dirpath, image), detail=0, paragraph=False)
+#                 word_list.extend(result)
+
+#                 flag = False
+
+#                 for i in result:
+#                     if any(re.search(pattern, i.upper(), flags=re.I | re.M | re.X) for pattern in patterns):
+#                         print(f"Image : {i} Form : {pattern} \n")
+#                         flag = True
+#                         break
+
+#                 if flag:
+#                     for pattern in patterns:
+#                         if not os.path.exists(dirpath.replace(".\\", '')+"\\"+pattern+"\\"):
+#                             os.makedirs(dirpath.replace(".\\", '')+"\\"+pattern+"\\")
+#                             print(f"New folder '{pattern}' created successfully!")
+#                         shutil.copy(dirpath.replace(".\\", '')+"\\"+image, dirpath.replace(".\\", '')+"\\"+pattern+"\\")
+#                         break
+                
+
+#                 else:
+#                     if not os.path.exists(dirpath.replace(".\\", '')+"\\Manual\\"):
+#                         os.makedirs(dirpath.replace(".\\", '')+"\\Manual\\")
+#                         print("Manual folder created successfully!")
+
+#                     shutil.copy(dirpath.replace(".\\", '')+"\\"+image, dirpath.replace(".\\", '')+"\\Manual\\")
+
+#                 end_time = time.time()
+#                 difference = end_time - start_time
+
+#                 print(f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
+#                 counter += 1
+
+#             dump.extend(word_list)
+#             index1 = len(dump)
+#             dump.insert(index1, image)
+
+#         if len(dump) > 0:
+#             with open(target_folder.replace(".\\", '').replace(".", '') + time.strftime("%d-%m-%Y") + ".txt", "a", encoding='utf-8') as f:
+#                 for item in dump:
+#                     f.write("%s\n" % item)
 
 def ocr_program(target_folder, patterns):
     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
