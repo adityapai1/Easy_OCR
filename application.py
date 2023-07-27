@@ -12,13 +12,74 @@ import re
 
 app = Flask(__name__)
 
+# def ocr_program(target_folder, patterns):
+#     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
+
+#     for pattern in patterns:
+#         print(f"{pattern}\n")
+
+#     print("Entered the OCR function")
+#     for dirpath, dirnames, filenames in os.walk(target_folder):
+#         if "Manual" in dirnames:
+#             dirnames.remove("Manual")
+
+#         counter = 1
+#         dump = []
+
+#         for image in filenames:
+#             word_list = []
+#             if (image.endswith('.jpg') or image.endswith('.png') or image.endswith('.jpeg')) and 'tmb' not in image:
+#                 start_time = time.time()
+#                 result = reader.readtext(os.path.join(dirpath, image), detail=0, paragraph=False)
+#                 word_list.extend(result)
+
+#                 flag = False
+
+#                 for i in result:
+#                     if any(re.search(pattern, i.upper(), flags=re.I | re.M | re.X) for pattern in patterns):
+#                         print(f"Image : {i} Form : {pattern} \n")
+#                         flag = True
+#                         break
+
+#                 if flag:
+#                     for pattern in patterns:
+#                         if not os.path.exists(dirpath.replace(".\\", '')+"\\"+pattern+"\\"):
+#                             os.makedirs(dirpath.replace(".\\", '')+"\\"+pattern+"\\")
+#                             print(f"New folder '{pattern}' created successfully!")
+#                         shutil.copy(dirpath.replace(".\\", '')+"\\"+image, dirpath.replace(".\\", '')+"\\"+pattern+"\\")
+#                         break
+                
+
+#                 else:
+#                     if not os.path.exists(dirpath.replace(".\\", '')+"\\Manual\\"):
+#                         os.makedirs(dirpath.replace(".\\", '')+"\\Manual\\")
+#                         print("Manual folder created successfully!")
+
+#                     shutil.copy(dirpath.replace(".\\", '')+"\\"+image, dirpath.replace(".\\", '')+"\\Manual\\")
+
+#                 end_time = time.time()
+#                 difference = end_time - start_time
+
+#                 print(f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
+#                 counter += 1
+
+#             dump.extend(word_list)
+#             index1 = len(dump)
+#             dump.insert(index1, image)
+
+#         if len(dump) > 0:
+#             with open(target_folder.replace(".\\", '').replace(".", '') + time.strftime("%d-%m-%Y") + ".txt", "a", encoding='utf-8') as f:
+#                 for item in dump:
+#                     f.write("%s\n" % item)
+
+
 def ocr_program(target_folder, patterns):
     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
 
     print("Entered the OCR function")
     for dirpath, dirnames, filenames in os.walk(target_folder):
-        if (dirnames == "manual") or any(name in dirnames for name in patterns):
-            continue
+        if "Manual" in dirnames:
+            dirnames.remove("Manual")
 
         counter = 1
         dump = []
@@ -30,25 +91,20 @@ def ocr_program(target_folder, patterns):
                 result = reader.readtext(os.path.join(dirpath, image), detail=0, paragraph=False)
                 word_list.extend(result)
 
-                matched_pattern = None
+                matched_patterns = [pattern for pattern in patterns if any(re.search(pattern, word.upper(), flags=re.I | re.M | re.X) for word in word_list)]
 
-                for i in result:
-                    for pattern in patterns:
-                        if re.search(pattern, i.upper(), flags=re.I | re.M | re.X):
-                            matched_pattern = pattern
-                            break
-                    if matched_pattern:
-                        break
-
-                if matched_pattern:
-                    pattern_folder = os.path.join(dirpath, matched_pattern)
-                    if not os.path.exists(pattern_folder):
-                        os.makedirs(pattern_folder)
-                    shutil.copy(os.path.join(dirpath, image), pattern_folder)
+                if matched_patterns:
+                    for pattern in matched_patterns:
+                        pattern_folder = os.path.join(dirpath, pattern)
+                        if not os.path.exists(pattern_folder):
+                            os.makedirs(pattern_folder)
+                            print(f"New folder '{pattern}' created successfully!")
+                        shutil.copy(os.path.join(dirpath, image), pattern_folder)
                 else:
                     manual_folder = os.path.join(dirpath, "Manual")
                     if not os.path.exists(manual_folder):
                         os.makedirs(manual_folder)
+                        print("New folder 'Manual' created successfully!")
                     shutil.copy(os.path.join(dirpath, image), manual_folder)
 
                 end_time = time.time()
@@ -67,7 +123,6 @@ def ocr_program(target_folder, patterns):
                     f.write("%s\n" % item)
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 
 def index():
@@ -78,10 +133,13 @@ def index():
 def result():
     if request.method == 'POST':
         target_folder = request.form['target_folder']
-        global FolderCodeWord
-        FolderCodeWord = request.form['folder_code_word']
-        ocr_program(target_folder , FolderCodeWord)
-        return render_template("success.html", )
+        folder_code_word = request.form['folder_code_word']
+        
+        # Convert the comma-separated string into a list
+        patterns_list = [pattern.strip() for pattern in folder_code_word.split(",")]
+        
+        ocr_program(target_folder, patterns_list)
+        return render_template("success.html")
 
 
 
