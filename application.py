@@ -52,8 +52,7 @@ def ocr_program(target_folder, patterns):
                 end_time = time.time()
                 difference = end_time - start_time
 
-                print(
-                    f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
+                print(f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
                 counter += 1
 
             dump.extend(word_list)
