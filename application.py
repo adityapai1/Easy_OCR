@@ -28,12 +28,10 @@ def ocr_program(target_folder, patterns):
             word_list = []
             if (image.endswith('.jpg') or image.endswith('.png') or image.endswith('.jpeg')) and 'tmb' not in image:
                 start_time = time.time()
-                result = reader.readtext(os.path.join(
-                    dirpath, image), detail=0, paragraph=False)
+                result = reader.readtext(os.path.join(dirpath, image), detail=0, paragraph=False)
                 word_list.extend(result)
 
-                matched_patterns = [pattern for pattern in patterns if any(re.search(
-                    pattern, word.upper(), flags=re.I | re.M | re.X) for word in word_list)]
+                matched_patterns = [pattern for pattern in patterns if any(re.search(pattern, word.upper(), flags=re.I | re.M | re.X) for word in word_list)]
 
                 if matched_patterns:
                     for pattern in matched_patterns:
@@ -80,8 +78,7 @@ def result():
         folder_code_word = request.form['folder_code_word']
 
         # Convert the comma-separated string into a list
-        patterns_list = [pattern.strip()
-                         for pattern in folder_code_word.split(",")]
+        patterns_list = [pattern.strip()for pattern in folder_code_word.split(",")]
 
         ocr_program(target_folder, patterns_list)
         return render_template("success.html")
