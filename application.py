@@ -13,7 +13,6 @@ import re
 app = Flask(__name__)
 
 
-
 def ocr_program(target_folder, patterns):
     reader = easyocr.Reader(['en', 'hi'], gpu=False, quantize=False)
 
