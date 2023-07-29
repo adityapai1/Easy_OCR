@@ -74,13 +74,17 @@ def index():
 def result():
     if request.method == 'POST':
         target_folder = request.form['target_folder']
-        folder_code_word = request.form['folder_code_word']
-
+        # folder_code_word = request.form['folder_code_word']
+        global uploaded_file
+        global text_words
         # Convert the comma-separated string into a list
-        patterns_list = [pattern.strip()for pattern in folder_code_word.split(",")]
+        uploaded_file = request.files["file"]
+        text = uploaded_file.read().decode("utf-8")
+        patterns_list = [pattern.strip()for pattern in text.split(",")]
 
         ocr_program(target_folder, patterns_list)
         return render_template("success.html")
+
 
 
 if __name__ == '__main__':
