@@ -78,7 +78,7 @@ def result():
         global uploaded_file
         global text_words
         # Convert the comma-separated string into a list
-        uploaded_file = request.files["file"]
+        uploaded_file = request.files["folder_code_word"]
         text = uploaded_file.read().decode("utf-8")
         patterns_list = [pattern.strip()for pattern in text.split(",")]
 

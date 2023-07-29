@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>OCR Form</title>
+    <title>OCR form</title>
     <style>
         body {
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -11,14 +11,13 @@
             background-color: aquamarine;
         }
 
-        
         h1 {
             text-align: center;
             font-size: 50px;
             padding-top: 100px;
         }
 
-        h3{
+        h3 {
             text-align: center;
         }
 
@@ -39,10 +38,14 @@
         input[type="text"] {
             width: 100%;
             padding-bottom: 5px;
-            padding-top:5px;
+            padding-top: 5px;
             font-size: 20px;
             border-radius: 8px;
             border: 2px solid #ccc;
+        }
+
+        input[type="file"] {
+            margin-top: 5px;
         }
 
         input[type="submit"] {
@@ -58,7 +61,6 @@
         }
 
         .input_strips {
-
             font-family: monospace;
             font-size: 75px;
         }
@@ -66,25 +68,45 @@
         input[type="submit"]:hover {
             background-color: rgb(189, 50, 142);
         }
-        div{
+
+        div {
             display: flex;
             margin: 0px auto;
         }
     </style>
 </head>
 
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>The OCR Project</title>
+</head>
+
 <body>
-    <h1>OCR Form</h1>
-    <form method="POST" action="/result">
-        <label for="target_folder"> <h3>Target Folder Path</h3> </label>
+    <h1>The OCR Project</h1>
+    <form method="POST" action="/result" enctype="multipart/form-data">
+        <label for="target_folder">
+            <h3>Target Folder Path</h3>
+        </label>
         <input type="text" id="target_folder" name="target_folder" required><br><br>
 
-        <label for="folder_code_word"><h3>Folder Code Word</h3></label>
-        <input type="text" id="folder_code_word" name="folder_code_word" required><br><br>
-        <div> 
+        <label for="folder_code_word">
+            <h3>Upload a text file in csv format</h3>
+        </label>
+        <!-- Accepts a .txt file for the folder code word -->
+        <div style="border: 2px solid rgba(22, 130, 0, 0.524); border-radius: 8px; padding-top: 5px;">
+            <input style="padding: 0px 30%;" type="file" id="folder_code_word" name="folder_code_word" required
+                accept=".txt"><br><br>
+        </div>
+
+        <div style="padding-top: 10px;">
             <input type="submit" value="Run OCR">
         </div>
     </form>
 </body>
+
+</html>
+
 
 </html>
