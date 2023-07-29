@@ -92,10 +92,17 @@ def index():
 
 def result():
     if request.method == 'POST':
+        
         target_folder = request.form['target_folder']
-        global FolderCodeWord
-        FolderCodeWord = request.form['folder_code_word']
-        ocr_program(target_folder , FolderCodeWord)
+        # global FolderCodeWord
+        global uploaded_file
+        global text_words
+        # FolderCodeWord = request.form['folder_code_word']
+        uploaded_file = request.files["file"]
+        text = uploaded_file.read().decode("utf-8")
+        text_words = text.split(",")
+
+        ocr_program(target_folder , uploaded_file)
         return render_template("success.html", )
 
 
