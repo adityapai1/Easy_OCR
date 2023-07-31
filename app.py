@@ -1,37 +1,23 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import time
-import threading
-import eventlet
 
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode='eventlet')
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-def ocr_process():
-    # Simulating a list of statements to be sent
-    statements = [
-        "Statement 1",
-        "Statement 2",
-        "Statement 3",
-        "Statement 4",
-        "Statement 5",
-    ]
+@socketio.on('connect', namespace='/multiples')
+def run_multiples():
+    for i in range(1, 11):
+        start_time = time.time()
+        result = i * 10
+        elapsed_time = time.time() - start_time
 
-    for statement in statements:
-        # Simulating OCR processing time
-        time.sleep(2)
-
-        # Send the statement to the client via WebSocket
-        socketio.emit('ocr_update', {'statement': statement}, namespace='/ocr')
+        # Send the update to the client via WebSocket
+        emit('multiples_update', {'result': result, 'seconds': elapsed_time}, namespace='/multiples')
 
 if __name__ == '__main__':
-    # Start the OCR process in a separate thread
-    ocr_thread = threading.Thread(target=ocr_process)
-    ocr_thread.start()
-
-    # Run the Flask app using the eventlet event loop
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)

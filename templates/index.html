@@ -1,20 +1,27 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>OCR Progress</title>
+    <title>Multiples of 10 Progress</title>
 </head>
+
 <body>
     <div id="progress"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <script>
-        const socket = io.connect('http://' + document.domain + ':' + location.port + '/ocr');
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/multiples');
 
-        socket.on('ocr_update', function(data) {
+        socket.on('multiples_update', function (data) {
             const progressDiv = document.getElementById('progress');
-            progressDiv.innerHTML = `OCR process took ${data.seconds} seconds.`;
+            const message = `Iteration: ${data.result / 10}, Result: ${data.result}, Elapsed Time: ${data.seconds.toFixed(2)} seconds`;
+            progressDiv.innerHTML += `<p>${message}</p>`;
+        });
+
+        socket.on('connect', function () {
+            console.log('Connected to server');
         });
     </script>
 </body>
+
 </html>
