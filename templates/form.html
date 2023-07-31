@@ -103,10 +103,33 @@
         <div style="padding-top: 10px;">
             <input type="submit" value="Run OCR">
         </div>
+        <div id="progress"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+        <script>
+            const progressDiv = document.getElementById('progress');
+            const ocrForm = document.getElementById('ocrForm');
+
+            const eventSource = new EventSource('/result');
+            eventSource.onmessage = function (event) {
+                progressDiv.innerHTML += `<p>${event.data}</p>`;
+            };
+
+            eventSource.onerror = function (event) {
+                if (event.target.readyState === EventSource.CLOSED) {
+                    progressDiv.innerHTML += '<p>Connection closed.</p>';
+                    ocrForm.submit(); // Submit the form after the SSE process is completed
+                }
+            };
+        </script>
     </form>
+
+
+
 </body>
 
 </html>
 
 
 </html>
+

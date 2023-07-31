@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 import easyocr
 import os
 import shutil
@@ -53,6 +53,8 @@ def ocr_program(target_folder, patterns):
                 difference = end_time - start_time
 
                 print(f"Time Taken for Image {counter} is {math.ceil(difference)} secs")
+                yield f"data: Iteration: {counter}, Elapsed Time: {math.ceil(difference)} seconds\n"
+
                 counter += 1
 
             dump.extend(word_list)
@@ -70,7 +72,7 @@ def index():
     return render_template("form.html")
 
 
-@app.route('/result', methods=['GET', 'POST'])
+@app.route('/result', methods=['POST'])
 def result():
     if request.method == 'POST':
         target_folder = request.form['target_folder']
@@ -80,12 +82,13 @@ def result():
         # Convert the comma-separated string into a list
         uploaded_file = request.files["folder_code_word"]
         text = uploaded_file.read().decode("utf-8")
-        patterns_list = [pattern.strip()for pattern in text.split(",")]
+        patterns_list = [pattern.strip() for pattern in text.split(",")]
 
-        ocr_program(target_folder, patterns_list)
-        return render_template("success.html")
+        return Response(ocr_program(target_folder, patterns_list), content_type='text/event-stream')
 
-
+@app.route('/success')
+def success():
+    return render_template('success.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
