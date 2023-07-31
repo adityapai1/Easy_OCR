@@ -1,0 +1,20 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR Progress</title>
+</head>
+<body>
+    <div id="progress"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/ocr');
+
+        socket.on('ocr_update', function(data) {
+            const progressDiv = document.getElementById('progress');
+            progressDiv.innerHTML = `OCR process took ${data.seconds} seconds.`;
+        });
+    </script>
+</body>
+</html>
